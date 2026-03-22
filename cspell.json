@@ -1,0 +1,31 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "autero",
+    "awscli",
+    "cidr",
+    "cidrsubnet",
+    "direnv",
+    "envrc",
+    "nixpkgs",
+    "oidc",
+    "opentofu",
+    "otel",
+    "otlp",
+    "runson",
+    "terragrunt",
+    "tfvars",
+    "tflint",
+    "tfsec",
+    "trivy",
+    "vpc"
+  ],
+  "ignorePaths": [
+    ".terraform/",
+    ".terragrunt-cache/",
+    ".direnv/",
+    "flake.lock",
+    ".terraform.lock.hcl"
+  ]
+}
