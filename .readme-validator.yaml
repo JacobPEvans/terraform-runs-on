@@ -1,0 +1,6 @@
+required_sections:
+  - Installation
+optional_sections:
+  - Contributing
+  - License
+  - API

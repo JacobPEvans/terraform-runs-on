@@ -1,0 +1,42 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.tf'
+      - '**.tfvars'
+      - 'terragrunt.hcl'
+      - '.terraform.lock.hcl'
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - uses: autero1/action-terragrunt@v3
+        with:
+          terragrunt-version: latest
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: us-east-2
+      - name: Terragrunt Init
+        run: terragrunt init
+      - name: Terragrunt Apply
+        run: terragrunt apply -auto-approve -no-color
+        env:
+          TF_VAR_license_key: ${{ secrets.RUNSON_LICENSE }}

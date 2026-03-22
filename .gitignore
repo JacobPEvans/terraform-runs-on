@@ -1,0 +1,55 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Terragrunt
+.terragrunt-cache/
+backend.tf
+provider_override.tf
+terragrunt-debug.tfvars.json
+
+# SSH keys and certificates
+*.pem
+*.key
+*_rsa*
+*_dsa*
+*_ecdsa*
+*_ed25519*
+*.crt
+*.p12
+*.pfx
+
+# AWS credentials
+.aws/
+aws-credentials
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Nix direnv cache
+.direnv/
+
+# AI workflows runtime
+.ai-workflows/
