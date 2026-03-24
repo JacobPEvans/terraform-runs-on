@@ -14,18 +14,19 @@ remote_state {
     if_exists = "overwrite_terragrunt"
   }
   config = {
-    bucket         = "terraform-runs-on-state-${local.aws_region_compact}-${get_aws_account_id()}"
+    bucket         = "${get_aws_account_id()}-${local.aws_region_compact}-tfstate-terraform-runs-on"
     key            = "terraform-runs-on/terraform.tfstate"
     region         = local.aws_region
     encrypt        = true
     use_lockfile   = true
-    dynamodb_table = "terraform-runs-on-locks-${local.aws_region_compact}"
+    dynamodb_table = "${local.aws_region_compact}-tflocks-terraform-runs-on"
     max_retries    = 5
   }
 }
 
 inputs = {
-  aws_region = local.aws_region
+  aws_region  = local.aws_region
+  license_key = get_env("RUNSON_LICENSE_KEY", "")
 }
 
 generate "provider" {
