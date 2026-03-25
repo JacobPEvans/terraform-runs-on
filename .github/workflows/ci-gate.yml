@@ -55,27 +55,42 @@ jobs:
       contents: read
       id-token: write
       pull-requests: write
+    env:
+      OIDC_ROLE_ARN: ${{ secrets.AWS_OIDC_ROLE_ARN }}
     steps:
+      - name: Check OIDC Configuration
+        id: check
+        run: |
+          if [ -z "$OIDC_ROLE_ARN" ]; then
+            echo "::warning::AWS_OIDC_ROLE_ARN secret not configured — skipping plan (expected during initial bootstrap)"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/checkout@v4
+        if: steps.check.outputs.skip != 'true'
       - uses: hashicorp/setup-terraform@v3
+        if: steps.check.outputs.skip != 'true'
       - uses: autero1/action-terragrunt@v3
+        if: steps.check.outputs.skip != 'true'
         with:
           terragrunt-version: latest
       - name: Configure AWS Credentials
+        if: steps.check.outputs.skip != 'true'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
           aws-region: us-east-2
       - name: Terragrunt Init
+        if: steps.check.outputs.skip != 'true'
         run: terragrunt init
       - name: Terragrunt Plan
+        if: steps.check.outputs.skip != 'true'
         id: plan
         run: terragrunt plan -no-color -out=tfplan 2>&1 | tee plan_output.txt
         env:
           TF_VAR_license_key: ${{ secrets.RUNSON_LICENSE }}
       - name: Post Plan to PR
+        if: steps.check.outputs.skip != 'true' && github.event_name == 'pull_request'
         uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
         with:
           script: |
             const fs = require('fs');
