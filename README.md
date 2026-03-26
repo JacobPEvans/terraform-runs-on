@@ -33,7 +33,7 @@ Cribl.Cloud Free (observability, $0/month)
 ## Cost
 
 | Component | Monthly |
-|-----------|---------|
+| --------- | ------- |
 | App Runner | ~$3 |
 | EC2 spot | ~$1-4 |
 | CloudWatch (30d) | ~$0.50 |
@@ -60,7 +60,7 @@ jobs:
 
 - [Nix](https://nixos.org/download) with flakes enabled
 - [direnv](https://direnv.net/)
-- [aws-vault](https://github.com/99designs/aws-vault) with a `terraform` profile
+- [aws-vault](https://github.com/99designs/aws-vault) with a `tf-runs-on` profile
 - A [RunsOn](https://runs-on.com) license key
 
 ### Setup
@@ -77,16 +77,16 @@ cd main
 direnv allow
 
 # Bootstrap infrastructure
-aws-vault exec terraform --no-session -- terragrunt init
-aws-vault exec terraform --no-session -- terragrunt apply
+aws-vault exec tf-runs-on -- doppler run -- terragrunt init
+aws-vault exec tf-runs-on -- doppler run -- terragrunt apply
 ```
 
 ## Development
 
 ```bash
-direnv allow                                              # Activate Nix shell
-aws-vault exec terraform --no-session -- terragrunt plan  # Preview changes
-aws-vault exec terraform --no-session -- terragrunt apply # Apply changes
+direnv allow                                                        # Activate Nix shell
+aws-vault exec tf-runs-on -- doppler run -- terragrunt plan         # Preview changes
+aws-vault exec tf-runs-on -- doppler run -- terragrunt apply        # Apply changes
 ```
 
 ## CI/CD
