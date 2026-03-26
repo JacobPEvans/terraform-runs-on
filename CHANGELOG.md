@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/JacobPEvans/terraform-runs-on/compare/v0.2.1...v0.2.2) (2026-03-26)
+
+
+### Bug Fixes
+
+* tighten OIDC policy permissions and update README ([d174bc3](https://github.com/JacobPEvans/terraform-runs-on/commit/d174bc38d8c9407d8463732e5a42abf6ad4b9226)), closes [#9](https://github.com/JacobPEvans/terraform-runs-on/issues/9)
+
 ## [0.2.1](https://github.com/JacobPEvans/terraform-runs-on/compare/v0.2.0...v0.2.1) (2026-03-26)
 
 
