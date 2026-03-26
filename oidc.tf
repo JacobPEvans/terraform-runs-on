@@ -55,8 +55,8 @@ data "aws_iam_policy_document" "github_actions_permissions" {
       "s3:GetBucketVersioning",
     ]
     resources = [
-      "arn:aws:s3:::terraform-runs-on-state-*",
-      "arn:aws:s3:::terraform-runs-on-state-*/*",
+      "arn:aws:s3:::*-tfstate-terraform-runs-on",
+      "arn:aws:s3:::*-tfstate-terraform-runs-on/*",
     ]
   }
 
@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "github_actions_permissions" {
       "dynamodb:DeleteItem",
       "dynamodb:DescribeTable",
     ]
-    resources = ["arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/terraform-runs-on-locks-*"]
+    resources = ["arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/*-tflocks-terraform-runs-on"]
   }
 
   # RunsOn CloudFormation stacks

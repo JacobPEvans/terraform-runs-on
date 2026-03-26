@@ -17,6 +17,8 @@
     "terragrunt",
     "tfvars",
     "tflint",
+    "tflocks",
+    "tfstate",
     "tfsec",
     "trivy",
     "vpc"

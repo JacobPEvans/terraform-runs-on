@@ -8,7 +8,7 @@ Self-hosted GitHub Actions runners on AWS EC2 spot instances via RunsOn.
 - **GitHub Actions** - CI/CD (OIDC for AWS auth)
 - **RunsOn** - Self-hosted runner orchestration
 - **nix-devenv** - Dev shell via `shells/terraform` (includes aws-vault, awscli2, sops, tfsec, trivy)
-- **aws-vault** - AWS credentials for S3 backend (profile: `terraform`)
+- **aws-vault** - AWS credentials for S3 backend (profile: `tf-runs-on`)
 - **Doppler** - Runtime secrets (RunsOn license key)
 
 ## Running Terraform Commands
@@ -18,21 +18,21 @@ Self-hosted GitHub Actions runners on AWS EC2 spot instances via RunsOn.
 ### The Command (always this, always both)
 
 ```bash
-aws-vault exec terraform -- doppler run -- terragrunt <COMMAND>
+aws-vault exec tf-runs-on -- doppler run -- terragrunt <COMMAND>
 ```
 
 ### Command Breakdown
 
-1. **`aws-vault exec terraform`** - AWS credentials for S3 backend (profile: `terraform`)
-2. **`doppler run --`** - Injects secrets as env vars (`RUNSON_LICENSE` as `TF_VAR_license_key`)
+1. **`aws-vault exec tf-runs-on`** - AWS credentials for S3 backend (profile: `tf-runs-on`)
+2. **`doppler run --`** - Injects Doppler secrets as env vars (e.g., `RUNSON_LICENSE_KEY`)
 3. **`terragrunt <COMMAND>`** - Runs Terraform
 
 ### Common Commands
 
 ```bash
-aws-vault exec terraform -- doppler run -- terragrunt validate
-aws-vault exec terraform -- doppler run -- terragrunt plan
-aws-vault exec terraform -- doppler run -- terragrunt apply
+aws-vault exec tf-runs-on -- doppler run -- terragrunt validate
+aws-vault exec tf-runs-on -- doppler run -- terragrunt plan
+aws-vault exec tf-runs-on -- doppler run -- terragrunt apply
 ```
 
 ### Claude Code Sessions
@@ -41,7 +41,7 @@ Start Claude inside aws-vault to get 1hr credential access without per-command p
 
 ```bash
 cd ~/git/terraform-runs-on/main
-aws-vault exec terraform -- claude
+aws-vault exec tf-runs-on -- claude
 ```
 
 Then terragrunt commands only need Doppler (AWS credentials are inherited):
@@ -53,13 +53,9 @@ doppler run -- terragrunt apply
 
 ### Doppler Configuration
 
-Doppler must be configured once per repo root (inherited by all worktrees):
-
-```bash
-doppler setup --project <PROJECT> --config <CONFIG>
-```
-
-This creates a local `.doppler.yaml` (gitignored).
+Doppler is configured at the `~/git/` scope (`iac-conf-mgmt/prd`), inherited by all repos.
+No per-repo `doppler setup` needed. The `RUNSON_LICENSE_KEY` env var is mapped to
+`license_key` via the `inputs` block in `terragrunt.hcl`.
 
 ## Dev Environment
 
@@ -83,9 +79,10 @@ direnv allow    # one-time per worktree, then automatic
 
 | Secret | Source | Used By |
 | ------ | ------ | ------- |
-| `RUNSON_LICENSE` | Doppler | `TF_VAR_license_key` via `doppler run` |
+| `RUNSON_LICENSE_KEY` | Doppler (`iac-conf-mgmt/prd`) | `license_key` via terragrunt `inputs` block |
+| `RUNSON_LICENSE` | GitHub repo secret | CI workflows (`TF_VAR_license_key`) |
 | `AWS_OIDC_ROLE_ARN` | Terraform output | CI OIDC auth |
-| AWS credentials | aws-vault profile `terraform` | S3 backend auth |
+| AWS credentials | aws-vault profile `tf-runs-on` | S3 backend auth |
 
 ## Cost Target
 
