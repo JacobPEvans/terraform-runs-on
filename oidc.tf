@@ -79,21 +79,72 @@ data "aws_iam_policy_document" "github_actions_permissions" {
     resources = ["arn:aws:cloudformation:*:${data.aws_caller_identity.current.account_id}:stack/runs-on*/*"]
   }
 
-  # EC2/VPC for RunsOn infrastructure
+  # EC2/VPC and App Runner — must remain * (AWS requires it for RunInstances, Describe*)
   statement {
     effect = "Allow"
     actions = [
       "ec2:*",
       "apprunner:*",
-      "sqs:*",
-      "dynamodb:*",
+      "sts:GetCallerIdentity",
+    ]
+    resources = ["*"]
+  }
+
+  # IAM scoped to runs-on resources only
+  statement {
+    effect = "Allow"
+    actions = [
       "iam:*",
-      "logs:*",
+    ]
+    resources = [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/runs-on*",
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:instance-profile/runs-on*",
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/runs-on*",
+    ]
+  }
+
+  # S3 scoped to runs-on module buckets (state bucket handled above)
+  statement {
+    effect = "Allow"
+    actions = [
       "s3:*",
+    ]
+    resources = [
+      "arn:aws:s3:::runs-on-*",
+      "arn:aws:s3:::runs-on-*/*",
+    ]
+  }
+
+  # DynamoDB scoped to runs-on module tables (state lock handled above)
+  statement {
+    effect = "Allow"
+    actions = [
+      "dynamodb:*",
+    ]
+    resources = [
+      "arn:aws:dynamodb:*:${data.aws_caller_identity.current.account_id}:table/runs-on-*",
+    ]
+  }
+
+  # SQS scoped to runs-on queues
+  statement {
+    effect = "Allow"
+    actions = [
+      "sqs:*",
+    ]
+    resources = [
+      "arn:aws:sqs:*:${data.aws_caller_identity.current.account_id}:runs-on-*",
+    ]
+  }
+
+  # Logs, CloudWatch, Budgets, SNS — Describe/List actions require * resources
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:*",
       "cloudwatch:*",
       "budgets:*",
       "sns:*",
-      "sts:GetCallerIdentity",
     ]
     resources = ["*"]
   }
